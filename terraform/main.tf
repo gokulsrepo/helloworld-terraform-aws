@@ -1,5 +1,27 @@
 provider "aws" {
-  region = "us-east-1" # Change this to your desired region
+  region = var.aws_region
+}
+
+variable "aws_account_id" {
+  type = string
+}
+
+variable "aws_region" {
+  type    = string
+  default = "us-east-1"
+}
+
+variable "subnet_id" {
+  type = string
+}
+
+variable "security_group_id" {
+  type = string
+}
+
+variable "tag" {
+  type    = string
+  default = "latest"
 }
 
 resource "aws_ecs_cluster" "hello_world_cluster" {
@@ -8,11 +30,16 @@ resource "aws_ecs_cluster" "hello_world_cluster" {
 
 resource "aws_ecs_task_definition" "hello_world_task" {
   family                   = "hello-world-task"
-  container_definitions    = <<DEFINITION
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = "256"
+  memory                   = "512"
+
+  container_definitions = <<DEFINITION
   [
     {
       "name": "hello-world-container",
-      "image": "${aws_account_id}.dkr.ecr.${aws_region}.amazonaws.com/hello-world-app:${tag}",
+      "image": "${var.aws_account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/hello-world-app:${var.tag}",
       "cpu": 256,
       "memory": 512,
       "essential": true,
@@ -35,8 +62,8 @@ resource "aws_ecs_service" "hello_world_service" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = ["subnet-12345678"] # Change this to your subnet IDs
-    security_groups = ["sg-12345678"]     # Change this to your security group IDs
+    subnets         = [var.subnet_id]
+    security_groups = [var.security_group_id]
     assign_public_ip = true
   }
 }
