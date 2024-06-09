@@ -21,7 +21,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t hello-world-app:latest .
+          docker build -t hello-world-app:latest -f ./DockerFile .
 
       - name: Log in to Amazon ECR
         id: ecr-login
