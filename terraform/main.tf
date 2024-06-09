@@ -24,7 +24,13 @@ variable "tag" {
   default = "latest"
 }
 
+# Check if the IAM role already exists
+data "aws_iam_role" "existing_ecs_task_execution_role" {
+  name = "ecsTaskExecutionRole"
+}
+
 resource "aws_iam_role" "ecs_task_execution" {
+  count = length(data.aws_iam_role.existing_ecs_task_execution_role.arn) == 0 ? 1 : 0
   name = "ecsTaskExecutionRole"
 
   assume_role_policy = jsonencode({
@@ -42,8 +48,9 @@ resource "aws_iam_role" "ecs_task_execution" {
 }
 
 resource "aws_iam_role_policy" "ecs_task_execution_policy" {
+  count = length(data.aws_iam_role.existing_ecs_task_execution_role.arn) == 0 ? 1 : 0
   name = "ecsTaskExecutionPolicy"
-  role = aws_iam_role.ecs_task_execution.id
+  role = length(data.aws_iam_role.existing_ecs_task_execution_role.arn) == 0 ? aws_iam_role.ecs_task_execution.id : data.aws_iam_role.existing_ecs_task_execution_role.id
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -73,7 +80,8 @@ resource "aws_ecs_task_definition" "hello_world_task" {
   network_mode             = "awsvpc"
   cpu                      = "256"
   memory                   = "512"
-  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  execution_role_arn       = length(data.aws_iam_role.existing_ecs_task_execution_role.arn) == 0 ? aws_iam_role.ecs_task_execution.arn : data.aws_iam_role.existing_ecs_task_execution_role.arn
+
   container_definitions = <<DEFINITION
   [
     {
