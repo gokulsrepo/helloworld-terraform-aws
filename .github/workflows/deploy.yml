@@ -12,7 +12,7 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-      
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -26,6 +26,7 @@ jobs:
 
     - name: Build, tag, and push Docker image to Amazon ECR
       id: build-image
+      if: success()
       run: |
         docker build -t <ECR_REPO> .
         docker tag <ECR_REPO>:latest <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/<ECR_REPO>:latest
@@ -38,6 +39,7 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
     - name: Update ECS service with new task definition
+      if: success()
       run: |
         aws ecs update-service --cluster <CLUSTER_NAME> --service <SERVICE_NAME> --task-definition <TASK_DEFINITION>
       env:
