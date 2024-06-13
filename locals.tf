@@ -12,7 +12,7 @@ locals {
   ecs_task_execution_role_name = "hello-world-task-execution-role"
 
   application_load_balancer_name = "hello-world-lb"
-  target_group_name              = "heelo-world-tg"
+  target_group_name              = "hello-world-tg"
 
   demo_app_service_name = "hello-world-service"
 }
