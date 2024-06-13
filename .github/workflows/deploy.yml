@@ -28,7 +28,7 @@ jobs:
       id: build-image
       if: success()
       run: |
-        docker build --no-cache -t ${{ secrets.ECR_REPO }} .
+        docker build --no-cache -t ${{ secrets.ECR_REPO }} . --platform=linux/amd64
         docker tag ${{ secrets.ECR_REPO }}:latest ${{ secrets.AWS_ACCOUNT_ID}}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPO }}:latest
         docker push ${{ secrets.AWS_ACCOUNT_ID}}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPO }}:latest
 
