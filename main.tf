@@ -1,13 +1,13 @@
 terraform {
   required_version = "~> 1.3"
 
-  backend "s3" {
-    bucket         = "gokulb-tf-bucket"
-    key            = "tf-infra/terraform.tfstate"
-    region         = "us-east-1"
-    dynamodb_table = "gokulb-tf-table"
-    encrypt        = true
-  }
+  # backend "s3" {
+  #   bucket         = "gokulb-tf-bucket"
+  #   key            = "tf-infra/terraform.tfstate"
+  #   region         = "us-east-1"
+  #   dynamodb_table = "gokulb-tf-table"
+  #   encrypt        = true
+  # }
 
   required_providers {
     aws = {
@@ -16,11 +16,11 @@ terraform {
   }
 }
 
-module "tf-state" {
-  source      = "./modules/tf-state"
-  bucket_name = local.bucket_name
-  table_name  = local.table_name
-}
+# module "tf-state" {
+#   source      = "./modules/tf-state"
+#   bucket_name = local.bucket_name
+#   table_name  = local.table_name
+# }
 
 module "ecrRepo" {
   source = "./modules/ecr"
